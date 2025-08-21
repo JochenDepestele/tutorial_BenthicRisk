@@ -1,0 +1,361 @@
+---
+title: "1.1 Depletion of Benthis métiers"
+execute: 
+  warning: false
+  echo: false
+message: false
+editor: visual
+---
+
+```{r setup, echo=F}
+# SET-UP ####
+rm(list=ls())
+
+## Libraries ----
+library(knitr)
+library(kableExtra)
+library(data.table)
+library(dplyr)
+library(terra)
+library(ggplot2)
+library(gtable)
+library(cowplot)
+library(grid)
+
+## functions, preferences ----
+theme_set(theme_bw())
+bluered2 <- c("#8B0000","#AF2B00","#D35600","#F78200","#FEA029","#FEB853","#FED06D", "#FEF4B4", "#9CD8B8","#4BB9C2","#253494")
+fspatraster_df <- function(x, aggregate = 1) {
+  resampleFactor <- aggregate        
+  inputRaster <- x    
+  inCols <- ncol(inputRaster)
+  inRows <- nrow(inputRaster)
+  # Compute numbers of columns and rows in the resampled raster
+  resampledRaster <- rast(ncol=(inCols / resampleFactor), 
+                          nrow=(inRows / resampleFactor),
+                          crs = crs(inputRaster))
+  # Match to the extent of the original raster
+  ext(resampledRaster) <- ext(inputRaster)
+  # Resample data on the new raster
+  y <- resample(inputRaster,resampledRaster,method='near')
+  # Extract cell coordinates into a data frame
+  coords <- xyFromCell(y, seq_len(ncell(y)))
+  # Extract layer names
+  dat <- stack(values(y, dataframe = TRUE))
+  # Add names - 'value' for data, 'variable' for different
+  # layer names in a multilayer raster
+  names(dat) <- c('value', 'variable')
+  dat <- cbind(coords, dat)
+  dat
+} # https://bookdown.org/mcwimberly/gdswr-book/raster-geospatial-data---continuous.html
+
+```
+
+## Depletion rates *d* by sediment class and Benthis métiers
+
+Global depletion rates were first estimated by [Hiddink et al. 2017](https://doi.org/10.1073/pnas.1618858114){target="_blank"} for four generic gear types (otter trawls, beam trawls, toothed and hydraulic dredges). These estimates were split by substrate type (mud, sand or gravel) by [Pitcher et al. 2022](https://doi.org/10.1073/pnas.2109449119){target="_blank"} and by Benthis-metier type by [Rijnsdorp et al. 2020](https://doi.org/10.1093/icesjms/fsaa050){target="_blank"}. The proportional grain size distribution from [Mitchell et al (2019)](https://doi.org/10.3390/geosciences9040182){target="_blank"} was categorized in three classes (mud, sand and gravel) following Pitcher et al (2022) to estimate sediment-specific depletion rates for each grid cell in the study region.
+
+```{r Sediment specific depletion rates, echo=F}
+wh_baseyear <- 2021
+
+# The script is hashed to speed up the website
+      # # SYSTEM BOUNDARY AND CHARACTERISTICS ####
+      # ## Base layer: ICES divisions ----
+      # ICESareas <- terra::vect("C:/Users/jdepestele/OneDrive - ILVO/000_data/Areas/ICES/ICES_areas_shp/ICES_Areas_20160601_cut_dense_3857.shp") 
+      # # "ICES Statistical Areas" are freely available at the permalink: https://gis.ices.dk/geonetwork/srv/eng/catalog.search
+      # ICESareas <- terra::project(ICESareas,"EPSG:4326")
+      # NSmask <- terra::subset(ICESareas,ICESareas$Area_27 %in% c("4.a","4.b","4.c","7.d", "3.a.20"))
+      # writeVector(NSmask,file.path("./input/NSmask.shp"), overwrite=TRUE)
+NSmask <- terra::vect("./input/NSmask.shp")
+      # NS_r_template <- rast(res=0.05,crs="EPSG:4326", ext=ext(-4.45, 12.1, 49.25, 62)) # Using the extent of the SAR database
+      # 
+      # ## Bathymetry ----
+      # bathy_r <- terra::rast("C:/Users/jdepestele/OneDrive - ILVO/000_data/EMODNET-Bathymetry/EMODnet_bathymetry_proj4326.tif")
+      # # EMODnet bathymetry was downloaded from https://emodnet.ec.europa.eu/geoviewer/
+      # bathy_r <- bathy_r[[1]]
+      # bathy_r <- resample(bathy_r, NS_r_template)
+      # bathy_r <- mask(crop(bathy_r, ext(NSmask)), NSmask)
+      # shelfslope_r <- ifel(bathy_r<=(-400) & bathy_r<=0, NA, bathy_r)
+      # setGDALconfig("GDAL_PAM_ENABLED", "FALSE")
+      # writeRaster(shelfslope_r,file.path("./input/shelfslope_r.tif"), overwrite=TRUE)
+shelfslope_r <- terra::rast("./input/shelfslope_r.tif")
+      # 
+      # ## Sediment ----
+      # fname <- "C:/Users/jdepestele/OneDrive - ILVO/000_data/sediment_Mitchell/Sediment predictions 1.zip"
+      # # Sediment data were downloadeded from Mitchell et al. 2019
+      # fname <- unzip(fname, exdir=tempdir())
+      # sedMit_r <- c(rast(fname[grepl("Mud_Fraction.tif$",fname)]),
+      #               rast(fname[grepl("Sand_Fraction.tif$",fname)]),
+      #               rast(fname[grepl("Gravel_Fraction.tif$",fname)]))
+      # names(sedMit_r) <- c("MudPercent","SandPercent","GravelPercent")
+      # sedMit_r <- terra::crop(sedMit_r, terra::ext(NSmask))
+      # sedMit_r <- terra::mask(sedMit_r, NSmask)
+      # sedMit_r <- terra::mask(sedMit_r, resample(shelfslope_r, sedMit_r))
+      # sedMit_r <- resample(sedMit_r, NS_r_template)
+      # sedMit_r <- sedMit_r * 100
+      # 
+      # ##> Sediment classes (mud, gravel and sand) ====
+      # # sedPitcher_minmm is a categoric variable, so numbers are provided (requirements from the terra package)
+      # sedMit_r[["sedPitcher"]] <-  ifel(sedMit_r[["GravelPercent"]]>30,2, # Gravel is > 2 mm according to Wentworth scale
+      #                                   ifel(sedMit_r[["SandPercent"]]>sedMit_r[["MudPercent"]],1, # sand is 
+      #                                        # > 0.0625 mm according to Wentworth scale
+      #                                        0)) # mud is the smallest fraction
+      # levels(sedMit_r[["sedPitcher"]]) <- data.frame(id=c(2,1,0), sedPitcher_minmm=c("gravel", "sand", "mud"))
+      # # plot(sedMit_r, fun=function()lines(NSmask))
+      # 
+      # # DEPLETION RATES BY SEDIMENT CLASS AND BENTHIS METIER ####
+drate <- setDT(readRDS("./input/deplrate_comb_PitcherRijnsdorp.RDS"))
+      # drate_wide <- dcast(drate[!is.na(benthisMet)], sedPitcher ~ benthisMet, value.var = "d_rate", na.rm=T)
+      # sedMit_dt <- setDT(as.data.frame(sedMit_r$sedPitcher, xy=T))
+      # setkey(sedMit_dt, sedPitcher)
+      # setkey(drate_wide, sedPitcher)
+      # sedMit_dt <- drate_wide[sedMit_dt]
+      # setcolorder(sedMit_dt, c("x","y"))
+      # drate_r <- terra::rast(as.data.frame(
+      #   sedMit_dt[ , .SD, .SDcols = is.numeric], # Only use numeric columns, i.e. exclude the sediment categories
+      #   xy=T),type="xyz", crs="EPSG:4326")
+      # drate_r <- resample(drate_r, NS_r_template)
+      # setGDALconfig("GDAL_PAM_ENABLED", "FALSE")
+      # writeRaster(drate_r,file.path("./input/drate_r.tif"), overwrite=TRUE)
+drate_r <- terra::rast("./input/drate_r.tif")
+
+oldcols<-c("gear", "sedPitcher","d_ratePitch","benthisMet","d_rateHiddink","d_rateRijn","d_rate")
+newcols<-c("Gear", "Sediment class","dr_Pitcher","Benthis métier","dr_Hiddink","dr_Rijnsdorp","dr_SEAwise")
+setnames(drate,oldcols,newcols)
+drate_print <- drate[Gear!="HD",..newcols]
+setcolorder(drate_print, c("Gear","dr_Hiddink","Sediment class","dr_Pitcher","Benthis métier","dr_Rijnsdorp","dr_SEAwise"))
+drate_print[`Benthis métier`=="TBB_CRU"]$dr_Hiddink <- 0.14
+drate_print <- drate_print[order(Gear,`Benthis métier`,`Sediment class`)]
+
+```
+
+```{r Depletion rates, echo=F}
+kable(drate_print, format = "html", table.attr = "style='width:30%;'") %>% 
+  kableExtra::kable_styling()
+
+```
+
+## Swept Area Ratio *SAR* by Benthis métiers
+
+The system's study area was defined by ICES Divisions 4abc excluding depths below 400 m, as these constitute fisheries regulated by the deep-sea access regulations [Van Denderen et al. 2021](https://doi.org/10.1093/icesjms/fsab237){target="_blank"}, and delineated by the availability of longevity data ([Rijnsdorp et al. 2018](https://doi.org/10.1002/eap.1731){target="_blank"}). *SAR* data were available for 2021 at 0.05 degree resolution for all Benthis métiers formatted in a similar way as the freely available 2009-2020 data from [ICES (2021)](https://doi.org/10.17895/ices.advice.8297){target="_blank"}. SAR estimates were pooled into broad categories that could be matched to the fleets and métiers as used in the FLBEIA model. These were otter trawls targeting fish (combining Benthis métiers: *OT_DMF*,*OT_MIX*,*OT_MIX_DMF_BEN*,*OT_MIX_DMF_PEL*), Nephrops-directed otter trawls (*OT_CRU*,*OT_MIX_CRU_DMF*), flatfish beam trawls (*TBB_DMF*), flyshoot seines (*SSC_DMF*), Danish seines (*SDN_DMF*) and other mobile bottom-contacting gears such as shrimp beam trawls (*DRB_MOL*,*OT_SPF*,*TBB_CRU*,*TBB_MOL*).
+
+```{r Loading SAR for baseline year 2021, echo=F}
+# Loading SAR data for Benthis metiers in year 2021 ####
+# Similar SAR data for this tutorial exercise are available for 2009-2020 from ICES (2021).
+# ICES. 2021. OSPAR request on the production of spatial data layers of fishing intensity/pressure. In Report of the ICES Advisory Committee, 2021. ICES Advice 2021, sr.2021.12. https://doi.org/10.17895/ices.advice.8297
+
+      # lst_files <- list.files("C:/Users/jdepestele/OneDrive - ILVO/000_data/fisheries/SAR/wgfbit_2023_sar_r",full.names=T)
+      # lst_files <- lst_files[grepl(".tif$",lst_files)]
+      # lst_files <- lst_files[!grepl("sar_r_tot\\.",lst_files)] # Remove the total SAR
+      # sar_r <- list()
+      # for(i in seq_along(lst_files)){
+      #   sar_r[[i]] <- terra::rast(lst_files[i])
+      #   sar_r[[i]] <- terra::crop(sar_r[[i]], ext(NSmask))
+      #   sar_r[[i]] <- terra::mask(sar_r[[i]], NSmask)
+      #   names(sar_r)[i] <- gsub("\\.tif","",stringr::str_split_i(lst_files[i], "sar_r_",2))
+      #   sar_r[[i]] <- subset(sar_r[[i]], names(sar_r[[i]])[grepl("sar_",names(sar_r[[i]]))])
+      #   ##>Select only the base year ====
+      #   sar_r[[i]] <- subset(sar_r[[i]], names(sar_r[[i]])[grepl(wh_baseyear,names(sar_r[[i]]))])
+      #   cat(paste("read spatraster",names(sar_r)[i],"->",i, "out of", length(lst_files),"\n"))
+      # } # end for-loop creating spatRasters
+      # sar_r_2021 <- rast(sar_r)
+      # sar_r_2021$tot <- sum(sar_r_2021, na.rm=T)
+      # sar_r_2021 <- resample(sar_r_2021, NS_r_template)
+sar_r_2021 <- terra::rast("C:/Users/jdepestele/OneDrive - ILVO/gitr/trade_off_RBS_scen_NS/input/confidential/SAR_OrigBenthisMetiers_2021.tif")
+
+```
+
+```{r Pooling and mapping SAR , echo=F, fig.show='hide', eval=F}
+## Map SAR for benthis metiers ####
+toplot_r <- rast()
+toplot_r$OT_DMF <- app(sar_r_2021[[c("OT_DMF","OT_MIX","OT_MIX_DMF_BEN","OT_MIX_DMF_PEL")]],sum,na.rm=T)
+toplot_r$OT_CRU <- app(sar_r_2021[[c("OT_CRU","OT_MIX_CRU_DMF")]],sum,na.rm=T)
+toplot_r$TBB_DMF <- sar_r_2021$TBB_DMF
+toplot_r$SSC_DMF <- sar_r_2021$SSC_DMF
+toplot_r$SDN_DMF <- sar_r_2021$SDN_DMF
+toplot_r$MBCG_oth <- app(sar_r_2021[[c("DRB_MOL","OT_SPF","TBB_CRU","TBB_MOL")]],sum,na.rm=T)
+toplot_r$tot <- app(toplot_r,sum,na.rm=T)
+
+toplot <- fspatraster_df(mask(ifel(is.na(toplot_r),0,
+                                   ifel(toplot_r>20,20,toplot_r)),
+                              shelfslope_r))
+selmask <- NSmask
+selbox <- seq(-4,12, by=4)
+toplot$variable <- factor(toplot$variable,
+                          levels = sort(unique(toplot$variable)),
+                          labels = c("Otter~trawls~(DEF)","Otter~trawls~(CRU)","Beam~trawls~(DEF)",
+                                     "Flyshoot","Danish~seines","Other~MBCG","Total"))
+gp1 <- ggplot() +
+  geom_raster(data = toplot,
+              aes(x = x, y = y, fill = value)) +
+  geom_sf(data = sf::st_as_sf(selmask), fill=NA, col="black") +
+  geom_sf(data = sf::st_as_sf(crop(ICESareas,ext(NSmask))), fill=NA, col="black") +
+  scale_fill_gradientn(name = "SAR", colors=c(rgb(t(col2rgb("#253494")),alpha=255*0.5,maxColorValue = 255),
+                                              rev(colorRampPalette(bluered2)(10))),
+                       breaks= c(0,5,10,20),
+                       na.value=NA) +
+  coord_sf(expand = FALSE) +
+  facet_wrap(facets = vars(variable), nrow = 2,
+             labeller = label_parsed) +
+  labs(# title = "Swept Area Ratio for pooled Benthis métiers in 2021", subtitle="SAR=20 represents values SAR>=20",
+       x="longitude", y="latitude") +
+  theme(text=element_text(size=10))+
+  scale_x_continuous(breaks = selbox)
+
+gp1 <- ggplotGrob(gp1)
+# check for unfilled facet panels
+facet.panels <- grep("^panel", gp1[["layout"]][["name"]])
+empty.facet.panels <- sapply(facet.panels, function(i) "zeroGrob" %in% class(gp1[["grobs"]][[i]]))
+empty.facet.panels <- facet.panels[empty.facet.panels]
+# establish extent of unfilled facet panels (including any axis cells in between)
+empty.facet.panels <- gp1[["layout"]][empty.facet.panels, ]
+empty.facet.panels <- list(min(empty.facet.panels[["t"]]), min(empty.facet.panels[["l"]]),
+                           max(empty.facet.panels[["b"]]), max(empty.facet.panels[["r"]]))
+names(empty.facet.panels) <- c("t", "l", "b", "r")
+# extract legend & copy over to location of unfilled facet panels
+guide.grob <- which(gp1[["layout"]][["name"]] == "guide-box-right")
+gp1 <- gtable_add_grob(x = gp1,
+                       grobs = gp1[["grobs"]][[guide.grob]],
+                       t = empty.facet.panels[["t"]],
+                       l = empty.facet.panels[["l"]],
+                       b = empty.facet.panels[["b"]],
+                       r = empty.facet.panels[["r"]],
+                       name = "new-guide-box")
+# squash the original guide box's row / column (whichever applicable) & empty its cell
+guide.grob <- gp1[["layout"]][guide.grob, ]
+if(guide.grob[["l"]] == guide.grob[["r"]]){
+  gp1 <- gtable_squash_cols(gp1, cols = guide.grob[["l"]])
+}
+if(guide.grob[["t"]] == guide.grob[["b"]]){
+  gp1 <- gtable_squash_rows(gp1, rows = guide.grob[["t"]])
+}
+gp1 <- gtable_remove_grobs(gp1, "guide-box-right")
+
+png("./output/SAR_by_pooledBenthismetier.png", unit="cm",width=16,height=12, res=500)
+suppressWarnings(grid.draw(gp1))
+dev.off()
+
+```
+
+![Swept Area Ratio for pooled Benthis métiers in 2021](./output/SAR_by_pooledBenthismetier.png)
+
+## Depletion of pooled Benthis metiers
+
+Swept Area Ratio (SAR) estimates were multiplied with their sediment-specific depletion rates in each grid cell to estimate the depletion caused by the Benthis métiers in 2021.
+
+```{r Pooling and mapping Benthis metiers to be matched with FLBEIA fleets and metiers, echo=F, eval=F}
+# DEPLETION ####
+## Create DEPLETION from SAR 2021 for benthis metiers ----
+names(drate_r)[!names(drate_r) %in% names(sar_r_2021)] # OT_MIX_CRU is not included in the SAR database of the North Sea
+names(sar_r_2021)[!names(sar_r_2021) %in% names(drate_r)] # the total SAR is not included in the depletion rate database
+selmets <- names(sar_r_2021)[names(sar_r_2021) %in% names(drate_r)] # Select all metiers except the total SAR estimate
+```
+
+```{r eval=F}
+#| echo: true
+depl_r <- sar_r_2021[[selmets]] * drate_r[[selmets]] # SAR and depletion rate are multiplied on a grid cell basis using spatRasters
+```
+
+```{r eval=F}
+# all.equal(names(sar_r_2021[[selmets]]),names(drate_r[[selmets]]),names(depl_r))
+
+# depl_r <- sar_r_2021[[selmets]] * drate_r[[selmets]]
+
+## POOL BENTHIS metiers for relevance in FLBEIA ----
+# SAR distribution across BENTHIS metiers
+setNames(round(global(depl_r, sum, na.rm=T)/sum(global(depl_r, sum, na.rm=T)[,1], na.rm=T)*100,3),"percentage (%)")
+# No 2021 data were submitted in benthic data call for TBB_MOL and OT_MIX_DMF_PEL => SAR=NA
+
+# All OT_DMF, OT_MIX and OT_MIX_DMF_BEN are pooled to OT_DMF
+selmet <- c("OT_DMF","OT_MIX","OT_MIX_DMF_BEN","OT_MIX_DMF_PEL") # OT_MIX_DMF_PEL is empty
+depl_r$OT_DMF <- app(depl_r[[selmet]], fun = "sum", na.rm = TRUE)
+selcols <- names(depl_r)[!names(depl_r) %in% selmet[selmet!="OT_DMF"]] # Remove redundant BENTHIS metiers (FISH otter trawls)
+depl_r <- depl_r[[selcols]]
+
+# All OT_CRU and OT_MIX_CRU_DMF are pooled to OT_CRU
+selmet <- c("OT_CRU","OT_MIX_CRU_DMF")
+depl_r$OT_CRU <- app(depl_r[[selmet]], fun = "sum", na.rm = TRUE)
+selcols <- names(depl_r)[!names(depl_r) %in% selmet[selmet!="OT_CRU"]] # Remove redundant BENTHIS metiers (CRUSTACEAN otter trawls)
+depl_r <- depl_r[[selcols]]
+
+# Pool all mobile bottom-contacting gears which are not considered in FLBEIA for management scenarios
+selmet <- c("DRB_MOL","OT_SPF","TBB_CRU","TBB_MOL") # TBB_MOL is empty
+depl_r$MBCG_other <- app(depl_r[[selmet]], fun = "sum", na.rm = TRUE)
+selcols <- names(depl_r)[!names(depl_r) %in% selmet] # Remove redundant BENTHIS metiers (Other mobile bottom-contacting gears)
+depl_r <- depl_r[[selcols]]
+
+depl_r <- depl_r[[c("OT_DMF","OT_CRU","TBB_DMF","SSC_DMF","SDN_DMF","MBCG_other")]]
+
+depl_r$tot <- app(depl_r, sum, na.rm=T)
+
+## Map depletion for Benthis metiers ----
+
+toplot <- fspatraster_df(mask(ifel(is.na(depl_r),0,depl_r),
+                              shelfslope_r))
+selmask <- NSmask
+selbox <- seq(-4,12, by=4)
+toplot$variable <- factor(toplot$variable,
+                          levels = sort(unique(toplot$variable)),
+                          labels = c("Otter~trawls~(DEF)","Otter~trawls~(CRU)","Beam~trawls~(DEF)","Flyshoot",
+                                     "Danish~seines","Other~MBCG","Total"))
+gp2 <- ggplot() +
+  geom_raster(data = toplot,
+              aes(x = x, y = y, fill = value)) +
+  geom_sf(data = sf::st_as_sf(selmask), fill=NA, col="black") +
+  # scale_fill_gradientn(name = "Depletion", colors=c(rgb(t(col2rgb("#253494")),alpha=255*0.5,maxColorValue = 255),
+  #                                                   rev(colorRampPalette(bluered)(10))[-2],
+  #                                                   rep("#8B0000",4)), # colors=rev(colorRampPalette(bluered)(6)), #
+  #                      breaks= c(0,0.5,1),# c(0, 0.5, 1, 1.5), # c(0,0.05, 0.1, 0.2, 0.5, 1, 5),
+  #                      na.value=NA) +
+  scale_fill_gradientn(name = "Depletion", colors=c(rgb(t(col2rgb("#253494")),alpha=255*0.5,maxColorValue = 255),
+                                                    rev(colorRampPalette(bluered2)(10))),
+                       breaks= c(0,0.25,0.5,1,1.5), # c(0,5,10,20)/10,
+                       na.value=NA) +
+  coord_sf(expand = FALSE) +
+  facet_wrap(facets = vars(variable), nrow = 2,
+             labeller = label_parsed) +
+  labs(# title = "Total depletion, and contribution of key metiers", subtitle="SDN_DMF is not shown",
+    x="longitude", y="latitude") +
+  theme(text=element_text(size=10))+
+  scale_x_continuous(breaks = selbox)
+
+gp2 <- ggplotGrob(gp2)
+# check for unfilled facet panels
+facet.panels <- grep("^panel", gp2[["layout"]][["name"]])
+empty.facet.panels <- sapply(facet.panels, function(i) "zeroGrob" %in% class(gp2[["grobs"]][[i]]))
+empty.facet.panels <- facet.panels[empty.facet.panels]
+# establish extent of unfilled facet panels (including any axis cells in between)
+empty.facet.panels <- gp2[["layout"]][empty.facet.panels, ]
+empty.facet.panels <- list(min(empty.facet.panels[["t"]]), min(empty.facet.panels[["l"]]),
+                           max(empty.facet.panels[["b"]]), max(empty.facet.panels[["r"]]))
+names(empty.facet.panels) <- c("t", "l", "b", "r")
+# extract legend & copy over to location of unfilled facet panels
+guide.grob <- which(gp2[["layout"]][["name"]] == "guide-box-right")
+gp2 <- gtable_add_grob(x = gp2,
+                       grobs = gp2[["grobs"]][[guide.grob]],
+                       t = empty.facet.panels[["t"]],
+                       l = empty.facet.panels[["l"]],
+                       b = empty.facet.panels[["b"]],
+                       r = empty.facet.panels[["r"]],
+                       name = "new-guide-box")
+# squash the original guide box's row / column (whichever applicable) & empty its cell
+guide.grob <- gp2[["layout"]][guide.grob, ]
+if(guide.grob[["l"]] == guide.grob[["r"]]){
+  gp2 <- gtable_squash_cols(gp2, cols = guide.grob[["l"]])
+}
+if(guide.grob[["t"]] == guide.grob[["b"]]){
+  gp2 <- gtable_squash_rows(gp2, rows = guide.grob[["t"]])
+}
+gp2 <- gtable_remove_grobs(gp2, "guide-box-right")
+
+# as.data.table(toplot)[, as.list(summary(value)), by = variable]
+# summary(depl_r)
+
+png(paste0("./output/Depletion_by_pooledBenthismetier.png"), unit="cm",width=16,height=12, res=500)
+grid.draw(gp2)
+dev.off()
+
+
+```
+
+![Depletion for pooled Benthis métiers in 2021](./output/Depletion_by_pooledBenthismetier.png)

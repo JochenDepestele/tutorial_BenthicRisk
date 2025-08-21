@@ -1,0 +1,213 @@
+---
+title: "1.2 Depletion of mixed fisheries scenarios"
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+```{r setup, echo=F}
+# SET-UP ####
+rm(list=ls())
+
+## Libraries ----
+library(knitr)
+library(kableExtra)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(terra)
+library(ggplot2)
+library(gtable)
+library(cowplot)
+library(grid)
+library(ggalluvial)
+
+## functions, preferences ----
+theme_set(theme_bw())
+bluered2 <- c("#8B0000","#AF2B00","#D35600","#F78200","#FEA029","#FEB853","#FED06D", "#FEF4B4", "#9CD8B8","#4BB9C2","#253494")
+
+```
+
+## Re-defining mixed fisheries to benthic-impact métiers
+
+### Goal-oriented definitions of fisheries métiers
+
+Mixed fisheries métiers were based on gear groupings as defined in [Council Regulation No 1342/2008](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1342){target="_blank"}, whereby, for instance, fishing vessels operating bottom trawls and demersal seines of mesh sizes equal to or larger than 100 mm were defined as gear group TR1, while those with mesh sizes between 70 mm and less than 100 mm are defined as TR2 fleets. These gear groupings were converted into gear groupings that are relevant for assessing benthic impact risk using detailed fleet and métier information from Annex 6 of the [ICES-WGMIXFISH report of 2023](https://doi.org/10.17895/ices.pub.24496237){target="_blank"}. Beam trawlers targeting fish were based on *BT1* and *BT2* groupings, while most *TR1* and *TR2* groupings converted to whitefish and *Nephrops* otter trawls respectively. Shrimp-targeting beam trawlers were excluded, because the mixed fisheries model was focused on commercial fish and *Nephrops*. Benthis métiers were defined in [Eigaard et al. 2016](https://doi.org/10.1093/icesjms/fsv099){target="_blank"}, revisited in [Rijnsdorp et al. 2020](https://doi.org/10.1093/icesjms/fsaa050){target="_blank"} for their gear-specific depletion rates and developments are still ongoing (e.g. [Van der Reijden et al. 2025](https://doi.org/10.1093/icesjms/fsaf106){target="_blank"}). Five Benthis métiers were included for the North Sea benthic impact risk assessment: beam trawls targeting flatfish (*TBB_DMF*), otter trawls targeting whitefish (*OT_DMF*) or crustaceans/*Nephrops* (*OT_CRU*) and demersal seines, both flyshoots (*SSC_DMF*) and Danish seines (*SDN_DMF*).
+
+```{r, echo=F}
+metmatch_NS <- setDT(read.csv("./input/FLBEIA to Benthis Metiers.csv",sep=";"))
+metmatch_NS_wide <- unique(metmatch_NS[,c("Benthis","metier")]) %>%
+    group_by(metier) %>%
+    mutate(row_id = row_number()) %>%
+    pivot_wider(
+        names_from = row_id,
+        values_from = Benthis,
+        names_prefix = "Benthis_"
+    ) %>%
+    ungroup()%>%
+  mutate(across(everything(), ~ifelse(is.na(.), "", .)))
+
+kable(setNames(metmatch_NS_wide, c("Mixed fisheries métiers","Benthis métiers", rep("",3))), 
+      format = "html", table.attr = "style='width:30%;'",
+      caption = "Re-defining mixed fisheries to benthic-impact métiers") %>% 
+  kableExtra::kable_styling()
+
+```
+
+### Conversion to benthic impact métiers
+
+Fleet-specific conversion factors were applied several otter trawler and 'other' categories into the relevant benthic impact métiers including e.g. demersal seiners, e.g. the German otter trawler fleet of LOA between 24 and 40m was split into 79% whitefish otter trawlers (*OT-DMF*) and 21% Flyshooters (*SSC-DMF*).
+
+```{r Matching métiers for baseline year 2021, echo=F}
+      # ## Match FBLEIA fleets and metiers with Benthis metiers ----
+scen_NS <- setDT(read.csv("./input/Summary_NS_EMSRR.Growth.Scenario_effort.per.metier_month42_median100iterations.csv"))
+scen_NS[,scenario := gsub("Growth_EMSRR_elasticAgePrice_","",scenario)]
+scen_NS <- scen_NS[,
+                   .(effort_median = unique(effort_median)),
+                   by=.(year,fleet,metier,scenario)] # Effort is the same across stocks
+# => remove data on landings, discards, catch and fish price
+setkey(scen_NS, fleet, metier)
+setkey(metmatch_NS, fleet, metier)
+scen_NS <- scen_NS[metmatch_NS] # !! ONLY KEEP THE FLEET and METIERS WHERE WE HAVE A MATCHED FACTOR
+scen_NS[, eff_matched := effort_median * Factor]
+      # 
+      # ## Plotting match of FBLEIA and Benthis metiers ----
+      # toplot <- scen_NS[year==2021 & scenario=="noCC_Status-quo"]
+      # toplot[,c("country"):=tstrsplit(fleet,"_", fixed=T, keep=c(1)) ]
+      # toplot[,c("fleet_geargroup"):=tstrsplit(fleet,"_", fixed=T, keep=c(2)) ]
+      # toplot[,c("subreg"):=stringr::str_split_i(toplot$metier,"\\.",2)]
+      # toplot[,c("LOA"):=fleet_geargroup]
+      # toplot$LOA <- gsub("Beam|Otter|Seine|DSeine|towed|OTH","",toplot$LOA)
+      # toplot[,studyarea:=ifelse(subreg=="4","NS",
+      #                           ifelse(subreg=="7D","EEC",
+      #                                  ifelse(subreg=="3AN", "3AN","OUT")))]
+      # toplot[is.na(studyarea),]$studyarea <- "OUT"
+      # setorderv(toplot, c("studyarea", "Benthis", "fleet_geargroup", "country"),order=c(-1,-1,1,1))
+      # # toplot[studyarea=='OUT', metier:=NA]
+      # # toplot[studyarea=='OUT', Benthis:=NA]
+      # # toplot[studyarea=='OUT', fleet:=NA]
+      # 
+      # toplotstudyarea <- toplot[studyarea!="OUT",
+      #                           .(eff_matched=sum(eff_matched, na.rm = T)),
+      #                           ,by=.(country,fleet,metier,Benthis)]
+      # ggplot(data = toplotstudyarea,
+      #        aes(axis1=country,axis2=fleet, axis3=metier, axis4 = Benthis, 
+      #            y=eff_matched)) +
+      #   geom_alluvium(aes(fill = Benthis, color = after_scale(fill))) +
+      #   geom_stratum(alpha = 0.5, linewidth=1) + # , linewidth=1
+      #   # scale_fill_manual(values=c(OT_CRU="#e64b35",OT_DMF="#4dbbd5",SDN_DMF="#3c5488", # khroma::color("turku")(5)
+      #   #                            SSC_DMF="#f39b7f", TBB_DMF="#00a087")) + # brewer.pal(5, "Dark2")
+      #   scale_fill_manual(values=setNames(ggsci::pal_jama()(5),
+      #                                     c("OT_CRU","OT_DMF","SDN_DMF","SSC_DMF","TBB_DMF"))) + 
+      #   annotate('text', y = rep(89000, 4), 
+      #            x = c(1, 2, 3, 4), label = c("Country", 'FLBEIA fleet', 'FLBEIA metier', 'Benthis metier')) +
+      #   # geom_text(stat = "stratum",
+      #   #           aes(label = after_stat(stratum))) +
+      #   ggrepel::geom_text_repel(
+      #     aes(label = ifelse(after_stat(x) %in% c(2), as.character(after_stat(stratum)), "")),
+      #     stat = "stratum", size = 3, direction = "y", nudge_x = -.5, segment.size=0.25) +
+      #   ggrepel::geom_text_repel(
+      #     aes(label = ifelse(after_stat(x) %in% c(3), as.character(after_stat(stratum)), "")),
+      #     stat = "stratum", size = 3, direction = "y", nudge_x = .4, segment.size=0.25) +
+      #   geom_text(aes(label = ifelse(after_stat(x)  %in% c(1,4), as.character(after_stat(stratum)), "")),
+      #             stat = "stratum", size=3) + 
+      #   theme(legend.box.spacing = unit(-1, 'cm'),
+      #         plot.margin = unit(c(0.5, 0.5, 0.5, 3.5), "cm")) +
+      #   # scale_x_continuous(limits=c(0.9,3.12)) + # lines of the columns disappear
+      #   # theme_void()
+      #   theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),
+      #         axis.ticks=element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank(),
+      #         panel.background=element_blank(),panel.border=element_blank(),
+      #         panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+      # ggsave("./output/FLBEIAfleetmetier_to_Benthismetier.png", unit="cm",width=30,height=18)
+
+```
+
+![Mixed fisheries métier conversion to Benthis métiers](./output/FLBEIAfleetmetier_to_Benthismetier.png){width="150%"}
+
+## Scaling depletion to FLBEIA scenarios
+
+Now that the mixed fisheries métiers are matched with the Benthis métiers for the baseline year 2021, we can use the depletion estimates of the Benthis métiers to also map the depletion of the mixed fisheries métiers in 2021.
+
+To estimate the depletion of mixed fisheries métiers in the simulated climate and management scenarios, we assumed that spatial effort distribution continued to follow the historical distribution pattern when increasing or decreasing fishing effort in the mixed fisheries scenarios. Fleet dynamics models have simulated other spatial dynamics than the historical effort distribution patterns (e.g. [Bastardie et al. 2025 - fmars](https://doi.org/10.3389/fmars.2025.1629180){target="_blank"}), but these fall outside the scope of this tutorial, where spatial effort distribution is assumed constant.
+
+Spatial depletion estimates of the mixed fisheries métiers of the baseline year (2021) are used to scale the depletion levels of other mixed fisheries scenarios up or down using the relative change of kW\*effort days to the baseline year in each grid cell.
+
+```{r Scaling depletion to FLBEIA scenarios, echo=T, eval=F}
+
+# Scaling depletion to FLBEIA scenarios ####
+## Relative effort change (kW*hours) to the base year 2021 ----
+##> annual change ====
+scenchange <- scen_NS[,
+                      .(eff_matched = sum(eff_matched, na.rm = T)),
+                      by=.(year,Benthis,scenario)]
+scenchange <- dcast(scenchange, Benthis ~ scenario+year, value.var="eff_matched")
+scens <- names(scenchange)[-1]
+# scenchange[,1:5]
+scenchange[, (scens) := scenchange[,-1] / scenchange$`noCC_Status-quo_2021`]
+# dcast(melt(scenchange, id.vars = "Benthis", variable.name="scenario"), scenario ~ Benthis)
+selcols <- names(scenchange)[!grepl("2021|Status-quo",names(scenchange))] # All scenarios in 2021 or with Status-quo
+# are the same as the base year
+scenchange <- scenchange[,..selcols]
+# t(scenchange)
+
+##> 5y change ====
+scenchange5y <- scen_NS[year>=2021]
+scenchange5y[,period:=cut(scenchange5y$year, seq(2020,2060,5))]
+# table(scenchange5y$year, scenchange5y$period)
+scenchange5y <- scenchange5y[year %in% c(2021, 2026:2060)] # 2021 is the base year and used for the first 5-year period (2021-2025)
+# All other years are based on the median 5-year effort
+scenchange5y <- scenchange5y[,
+                             .(eff_matched_5y = median(eff_matched, na.rm=T)),
+                             by=.(period, Benthis, scenario)]
+scenchange5y <- dcast(scenchange5y, Benthis ~ scenario+period, value.var="eff_matched_5y")
+scens <- names(scenchange5y)[-1]
+scenchange5y[, (scens) := scenchange5y[,-1] / scenchange5y$`noCC_Status-quo_(2020,2025]`]
+# dcast(melt(scenchange5y, id.vars = "Benthis", variable.name="scenario"), scenario ~ Benthis)
+selcols <- names(scenchange5y)[!grepl("\\(2020\\,2025\\]|Status-quo",names(scenchange5y))] # All scenarios in 2020-2025 or
+# with Status-quo are the same as the base year
+scenchange5y <- scenchange5y[,..selcols]
+
+# annual and 5y change ====
+setkey(scenchange5y, Benthis)
+setkey(scenchange, Benthis)
+scenchange <- scenchange[scenchange5y]
+
+# names(scenchange)
+
+## Scaling depletion using relative kW*hours change ----
+# Load the Spatraster with depletion estimates for Benthis metiers that was created in Step 1.1 on Depletion of Benthis métiers.
+depl_r <- terra::rast("C:/Users/jdepestele/OneDrive - ILVO/gitr/trade_off_RBS_scen_NS/input/confidential/DEPLETION_PooledBenthisMetiers_2021.tif")
+deplscen_r <- depl_r$tot
+names(deplscen_r) <- "noCC_Status-quo_2021" # baseline scenario NS
+depl_met <- data.table()
+starttime <- Sys.time() # Note that 600 scenarios take about 15 minutes to run (depending on RAM, etc).
+for (i in seq_along(names(scenchange)[-1])){
+  cat(paste("run scenario",i,"out of",length(names(scenchange)[-1])," => ",names(scenchange)[-1][i],"\n"))
+  selscen <- names(scenchange)[-1][i]
+  if(!selscen %in% c("noCC_Status-quo_2021","Status quo_current_2021")){
+    temp_convf <- c(setNames(scenchange[[selscen]], scenchange$Benthis),
+                    setNames(1, "MBCG_other"))
+    temp_r <- depl_r[[names(temp_convf)]] * temp_convf # multiply metiers with their
+    # conversion factors by scenario, without
+    # using the total depletion, and keeping the
+    # MBCG_other constant
+    ##>Scenario-depletion by Benthis metier could be estimated from temp_r  (not done) ====
+    deplscen_r <- c(deplscen_r,
+                    app(temp_r, fun = "sum", na.rm = TRUE)) # sum all metiers in the scenario
+    names(deplscen_r)[i+1] <- selscen
+    temp_dt <- as.data.table(as.data.frame(t(global(temp_r, sum, na.rm=T)))) # Sum Depletion of all grid cells
+    temp_dt[,scen:=selscen]
+    depl_met <- rbindlist(list(depl_met,temp_dt))
+  }
+  endtime <- Sys.time()
+  round(endtime - starttime, 2)
+}
+# names(deplscen_r)
+
+# setGDALconfig("GDAL_PAM_ENABLED", "FALSE")
+# writeRaster(deplscen_r,file.path("./output/Depletion_tot_FLBEIA_scenarios.tif"), overwrite=TRUE)
+
+
+```

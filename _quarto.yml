@@ -1,0 +1,45 @@
+project:
+  type: website
+
+website:
+  title: "Risk assessments of fishing impacts on benthic state"
+  open-graph: true # https://quarto.org/docs/websites/website-tools.html#open-graph
+  page-footer: 
+    left: |
+      "Made with Quarto by Jochen Depestele ([ILVO](https://www.ilvo.vlaanderen.be){target="_blank"})
+    center: |
+      ![](./SeaWiseFinal-01.png){fig-alt="Posit" height=25px .light-content} 
+       Developed under [SEAwise](https://seawiseproject.org){target="_blank"} 
+  navbar:
+    logo: "EBFM-Tool-Icons-06-1-300x233.png"
+    right:
+      - text: 1. Depletion scenarios
+        href: 1_depletion_scenarios.qmd
+      - text: 2. RBS estimation
+        href: 2_RBS_estimation.qmd
+      - text: 3. MSFD indicators
+        href: 3_MSFD_indicators.qmd
+  sidebar:
+    - title: "1. Depletion scenarios"
+      style: "docked"
+      background: light
+      contents:
+        - 1_depletion_scenarios.qmd
+        - text: "---"
+        - 1_1_Depletion_of_Benthis_métiers.qmd
+        - 1_2_Depletion_of_mixed_fisheries_scenarios.qmd
+    - title: "2. RBS estimation"
+      style: "docked"
+      background: light
+      contents:
+        - 2_RBS_estimation.qmd
+        - text: "---"
+        - 2_1_Benthic_sensitivity.qmd
+        - 2_2_RBS_from_depl_and_sens.qmd
+
+format:
+  html:
+    theme: [cosmo, styles.scss]
+    code-fold: true
+    code-copy: true
+    code-link: true

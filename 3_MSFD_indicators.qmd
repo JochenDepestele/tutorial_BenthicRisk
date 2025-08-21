@@ -1,0 +1,137 @@
+---
+title: "3. MSFD indicators"
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+Seafloor integrity is one of the 11 Descriptors in European environmental legislation to protect the marine ecosystem and biodiversity, i.e. Descriptor 6 in the Marine Strategy Framework Directive ([MSFD 2008/56/EC](http://data.europa.eu/eli/dir/2008/56/oj){target="_blank"}). This tutorial follows the rationale of the MSFD implementation for setting thresholds, which is defined under the fifth criterion stipulating adverse effects on habitats (D6C5). Two thresholds determine Good Environmental Status: one for habitat extent and one habitat quality.
+
+1. The maximum proportion of a benthic broad habitat type in an assessment area that can be adversely affected is **25 % of its natural (habitat) extent** (≤ 25 %) (see the Commission Notice on the threshold values [C/2024/2078](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:C_202402078){target="_blank"}). Broad habitat types (BHT) were defined by the EUSeaMap 2023 ([Vasquez et al. 2023](https://doi.org/10.13155/97116){target="_blank"}), while the areal proportions were estimated using grid cell resolution of 0.05 degrees. The proportion of its natural extent are shown for the Greater North Sea as a whole, but can also be estimated by jurisdiction, e.g. UK, EU and Norwegian waters or by national waters defined by the Exclusive Economic Zones (EEZ).
+
+2. The threshold for the habitat extent was agreed upon, but the D6 implementation has to this date (August 2025) not decided which thresholds and benthic indicators will be sued for assessment of **habitat quality**, i.e. what constitutes an adverse habitat impact. RBS classifies as one of the candidate indicators for its responsiveness to bottom trawling, but might have to be complemented with benthic (diversity) indicators to provide a more comprehensive understanding of seabed impacts ([Van Denderen et al. 2024](https://doi.org/10.1002/eap.3050){target="_blank"}). This tutorial is focused on RBS implementation and arbitrarily selected three threshold values (RBS = 0.75, 0.8 and 0.9) to assess which habitat types achieve this target. The 0.8 threshold was also used as cutoff in the ICES workshop [WKBENTH2](https://doi.org/10.17895/ices.pub.20731537.v1){target="_blank"} and [Pitcher et al. 2022](https://doi.org/10.1073/pnas.2109449119){target="_blank"}. All values are at the upper boundary of the ranges discussed in [Hiddink et al. 2023](https://doi.org/10.1093/icesjms/fsad035){target="_blank"}.
+
+The code and figure below illustrate which BHT achieved the 75% habitat extent threshold at the scale of the Greater North Sea using three habitat quality thresholds (RBS=0.75, 0.8 or 0.9).
+
+```{r setup, echo=F}
+# SET-UP ####
+## Libraries ----
+library(knitr)
+library(terra)
+library(data.table)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r MSFD assessment, echo=T}
+# LOAD DATA ####
+NSmask <- terra::vect("./input/NSmask.shp")
+shelfslope_r <- terra::rast("./input/shelfslope_r.tif")
+deplscen_r <- terra::rast("C:/Users/jdepestele/OneDrive - ILVO/gitr/trade_off_RBS_scen_NS/input/confidential/Depletion_tot_FLBEIA_scenarios.tif") # terra::rast("./output/Depletion_tot_FLBEIA_scenarios.tif")
+recov_r <- terra::rast(file.path("./input/RECOVERY_LONGEVITY_Hiddink_inPrep.tif"))
+
+hab_r <- terra::rast(file.path("C:/Users/jdepestele/OneDrive - ILVO/000_data/EMODNET-Seabedhabitat/EUSeaMap2023/EUSeaMap_2023_shp/EUSeaMap_2023_MSFD_EUNIS2019D_EUNIScode_Substrt_extra.tif"))
+hab_r <- hab_r$MSFD_BB
+# levels(hab_r)
+# names_bht <- data.frame(value=seq(0,22),
+#                         MSFD_BBHT=c("Abyssal", "Circalittoral coarse sediment", "Circalittoral mixed sediment",
+#                                     "Circalittoral mud", "Circalittoral rock and biogenic reef", "Circalittoral sand",
+#                                     "Infralittoral coarse sediment",  "Infralittoral mixed sediment", "Infralittoral mud",
+#                                     "Infralittoral rock and biogenic reef", "Infralittoral sand",
+#                                     "Lower bathyal rock and biogenic reef", "Lower bathyal sediment",
+#                                     "Lower bathyal sediment or Lower bathyal rock and biogenic reef", "Na",
+#                                     "Offshore circalittoral coarse sediment", "Offshore circalittoral mixed sediment",
+#                                     "Offshore circalittoral mud", "Offshore circalittoral rock and biogenic reef",
+#                                     "Offshore circalittoral sand", "Upper bathyal rock and biogenic reef",
+#                                     "Upper bathyal sediment",
+#                                     "Upper bathyal sediment or Upper bathyal rock and biogenic reef"))
+# levels(hab_r) <- names_bht[names_bht$value %in% unique(values(hab_r$MSFD_BB)),]
+hab_r <- mask(crop(hab_r, ext(NSmask)), NSmask)
+hab_r <- resample(hab_r, shelfslope_r)
+
+eez_vct <- unzip(file.path("C:/Users/jdepestele/OneDrive - ILVO/000_data/Areas/EEZ/MarineRegions/EEZ_land_union_v4_202410.zip"), exdir=tempdir())
+eez_vct <- terra::vect(eez_vct[grepl("\\.shp$", eez_vct)])
+eez_vct <- subset(eez_vct, eez_vct$TERRITORY1 %in% c("Belgium","Denmark","France","Jersey","Germany","Guernsey","Netherlands",
+                                                     "Sweden","Norway","United Kingdom"))
+eez_r <- terra::rasterize(eez_vct, shelfslope_r, "TERRITORY1")
+
+rbs_r <- terra::rast(file.path("./output/RBS.tif"))
+
+# MSFD Assessment ####
+to_dt <- setDT(as.data.frame(c(recov_r[["medlong"]], hab_r, eez_r, cellSize(eez_r, unit="km"),rbs_r), 
+                             xy=T))
+to_dt <- to_dt[!is.na(medlong)]
+to_dt <- to_dt[,jurisdiction := TERRITORY1]
+to_dt[!jurisdiction %in% c("Norway","United Kingdom")]$jurisdiction <- "EuropeanUnion"
+# prop_EEZ_BHT <- to_dt[,
+#                       c(area_sqkm = as.list(sum(area,na.rm=T)),
+#                         aboveThrs0.75 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.75,area,0))/sum(area,na.rm=T))),
+#                         aboveThrs0.80 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.80,area,0))/sum(area,na.rm=T))),
+#                         aboveThrs0.90 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.90,area,0))/sum(area,na.rm=T)))),
+#                       by=.(TERRITORY1, MSFD_BB),
+#                       .SDcols=names(rbs_r)]
+# prop_jur_BHT <- to_dt[,
+#                       c(area_sqkm = as.list(sum(area,na.rm=T)),
+#                         aboveThrs0.75 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.75,area,0))/sum(area,na.rm=T))),
+#                         aboveThrs0.80 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.80,area,0))/sum(area,na.rm=T))),
+#                         aboveThrs0.90 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.90,area,0))/sum(area,na.rm=T)))),
+#                       by=.(jurisdiction, MSFD_BB),
+#                       .SDcols=names(rbs_r)]
+prop_BHT <- to_dt[,
+                  c(area_sqkm = as.list(sum(area,na.rm=T)),
+                    aboveThrs0.75 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.75,area,0))/sum(area,na.rm=T))),
+                    aboveThrs0.80 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.80,area,0))/sum(area,na.rm=T))),
+                    aboveThrs0.90 = as.list(lapply(.SD, function(x)sum(ifelse(x>=0.90,area,0))/sum(area,na.rm=T)))),
+                  by=.(MSFD_BB),
+                  .SDcols=names(rbs_r)]
+
+```
+
+```{r plotting, echo=F, eval=F}
+toplot <- melt(prop_BHT, id.vars=c("MSFD_BB", "area_sqkm"), value.name="prop")
+toplot[, variable:= gsub("\\.n","\\.%%n",variable)]
+toplot[, c("threshold", "scenario") := tstrsplit(variable, "\\.%%", fixed = FALSE)]
+setcolorder(toplot, c("MSFD_BB", "area_sqkm", "threshold", "scenario", "prop"))
+setnames(toplot, "MSFD_BB","BHT")
+toplot[, threshold_num := as.numeric(gsub("aboveThrs","",threshold))]
+toplot <- toplot[!is.na(BHT)]
+
+# order MSFD_BB by area_sqkm
+toplot <- toplot %>%
+  group_by(BHT, area_sqkm) %>% 
+  ungroup() %>%
+  mutate(BHT = reorder(BHT, area_sqkm),
+         scenario = factor(scenario,
+                           levels = c("noCC_Status-quo_2021","noCC_FMSY-Min_(2025,2030]")))
+thresh_labels <- c(
+  "aboveThrs0.75" = "Habitat threshold (RBS=0.75)",
+  "aboveThrs0.80" = "Habitat threshold (RBS=0.80)",
+  "aboveThrs0.90" = "Habitat threshold (RBS=0.90)"
+)
+# make plot
+ggplot2::ggplot(toplot, aes(x = BHT, y = prop, fill = scenario)) +
+  geom_col(position = position_dodge(width = 0.75)) +
+  facet_wrap(~threshold, nrow = 1, labeller = labeller(threshold = thresh_labels)) +
+  geom_hline(aes(yintercept = 0.75),linetype = "dashed") +
+  scale_fill_brewer(palette="Set2", direction=-1) +
+  labs(
+    x = "Broad Habitat Type (sorted by area)",
+    y = "Areal proportion meeting the habitat quality threshold",
+    fill = "Scenario",
+    title = "Areal proportion meeting the habitat threshold by MSFD Broad Habitat Type and scenario",
+    subtitle = "Dashed line = threshold value of habitat extent"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.box = "horizontal"
+  )
+
+ggplot2::ggsave("./output/MSFDassess_sel_scen.png", unit="cm",width=30,height=15)
+
+```
+
+![MSFD assessment](./output/MSFDassess_sel_scen.png)

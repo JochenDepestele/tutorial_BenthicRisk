@@ -1,0 +1,36 @@
+---
+title: "2.1 Benthic sensitivity"
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+## Benthic sensitivity
+
+Benthic sensitivity was estimated as the intrinsic rate of biomass increase or recovery rate *r* of benthic community biomass, which was approximated by the longevity distribution, as long-lived taxa exhibit greater sensitivity to disturbance ([Hiddink et al. 2019](https://doi.org/10.1111/1365-2664.13278){target="_blank"}). Longevity was defined as the fuzzy-coded maximum lifespan of a taxa (e.g. [Bolam et al. 2014](https://doi.org/10.1016/j.seares.2013.05.003){target="_blank"}) and spatially mapped by predicting the untrawled state of benthic communities in sediments with slower-growing, larger-bodied and longer-lived macrobenthic biota following the methodology of [Rijnsdorp et al. 2018](https://doi.org/10.1002/eap.1731){target="_blank"}, which is described in detail in the [ICES-WGFBIT tutorial on Github](https://github.com/ices-eg/FBIT/tree/master/TAF%20-%20ICES%20tutorial){target="_blank"}), and applied in SEAwise to several regional seas ([Van Hoey et al. 2023](https://doi.org/10.11583/DTU.24049767.v1){target="_blank"}).
+
+```{r Benthic sensitivity, echo=F}
+# BENTHIC SENSITIVITY (sediment-specific recovery rates) ####
+library(knitr)
+library(terra)
+recov_r <- terra::rast(file.path(paste0("./input/RECOVERY_LONGEVITY_Hiddink_inPrep.tif")))
+      # shelfslope_r <- terra::rast("./input/shelfslope_r.tif")
+      # sealand <- c("#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58")
+      # ICESareas <- terra::vect("C:/Users/jdepestele/OneDrive - ILVO/000_data/Areas/ICES/ICES_areas_shp/ICES_Areas_20160601_cut_dense_3857.shp")
+      # ICESareas <- terra::project(ICESareas,"EPSG:4326")
+
+      # png(paste0("./output/RECOVERY_LONGEVITY_Hiddink_inPrep.png"), unit="cm",width=12,height=16, res=500)
+      # par(oma=c(1,1,1,4))
+      # plot(terra::ext(recov_r),  # , bty="n", box=FALSE
+      #      xlab="longitude",ylab="latitude", col="#B7C3A3") # main="Recovery rates",
+      # plot(crop(ICESareas,ext(recov_r)),add=T, col="grey90")
+      # plot(mask(recov_r[["medlong_10plus"]], shelfslope_r),
+      #      col=colorRampPalette(sealand)(100), 
+      #      add=T)
+      # plot(crop(ICESareas,ext(recov_r)),add=T)
+      # dev.off()
+
+```
+
+![Median longevity following Rijnsdorp et al. 2018. Recovery rate is the reciprocal of Longevity (*r* = 5.31/longevity , Hiddink et al. 2019)](./output/RECOVERY_LONGEVITY_Hiddink_inPrep.png){width="50%"}

@@ -1,0 +1,15 @@
+---
+title: "2. RBS estimation"
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+Relative Benthic State (RBS) is a quantitative risk indicator of the benthic biomass under mobile bottom-contact fishing, expressed as the fraction of biomass remaining relative to the unfished carrying capacity of the community (1 = no depletion; 0 = fully depleted) using the balance between fishing‐induced mortality and natural recovery. RBS is derived by solving a Schaefer(1954)-type of logistic population model at equilibrium, with an additional term to estimate recurring depletion induced by mobile fishing gears ([Ellis et al. 2014](http://dx.doi.org/10.1139/cjfas-2013-0426){target="_blank"}, [Pitcher et al. 2017](https://doi.org/10.1111/2041-210X.12705){target="_blank"}, [Hiddink et al. 2017](https://doi.org/10.1073/pnas.1618858114){target="_blank"}). Depletion is assumed to occur with an average intensity estimated by the Swept-Area Ratio *SAR* or the number of trawl passes per unit area per year and the depletion rate *d* or the fraction of biomass that each pass removes (see [Depletion scenarios](1_depletion_scenarios.qmd)). Let *B* be the benthic biomass, *K* the unfished carrying capacity and *r* the intrinsic recovery rate (see [Benthic sensitivity](2_1_Benthic_sensitivity.qmd)), then the equilibrium is found at:
+
+$$
+\text{RBS} = \frac{B}{K} = 1- \frac{d \cdot \text{SAR}}{r}
+$$
+
+RBS is a linear index that falls between 0 and 1 to explicitly indicate that benthic state declines with fishing frequency and intensity (*d*), and improves with faster recovery (*r*).

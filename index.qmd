@@ -1,0 +1,46 @@
+---
+# Webpage is based on this tutorial https://www.youtube.com/watch?v=l7r24gTEkEY
+# We first went to the appropriate directory (cd ..) and then we imported a template using the Terminal (instead of the console) in RStudio and the following command:
+  # quarto use template EmilHvitfeldt/website-template
+  # The template can also be found here: https://github.com/EmilHvitfeldt/website-template/tree/main
+# And then we modified the template to fit our purpose, and we published it through the Terminal using the commands:
+  # quarto publish quarto-pub
+  # published with the account jochen.depestele@ilvo.vlaanderen.be (github account allowing Quarto access)
+  # and pushing 'enter' created the site (with a name automatically given to it)
+# NEXT STEP is to add links to the various subpages: https://www.youtube.com/watch?v=k65E-8PXZmA
+  # structure: by creating qmd files in the root (it can also be in subfolder where the QMD-files are sitting)
+  # navigation: by adding text and a link to the file in the navbar in the _quarto.yml file
+#
+# https://jochendepestele.quarto.pub/assessment-of-benthic-impact-risk/  
+# login to https://quartopub.com/ to see the details (be logged in)
+#
+title: "Risk assessments of fishing impacts on benthic state"
+subtitle: "Tutorial for the assessment of Relative Benthis State (RBS) using métier-specific effort changes from simulated fisheries management scenarios of the SEAwise North Sea case study"
+image: SeaWiseFinal-01.png
+about: # https://quarto.org/docs/websites/website-about.html
+  template: trestles # Template based on https://github.com/EmilHvitfeldt/website-template
+  links:
+    - icon: github
+      text: SEAwise Github
+      href: https://github.com/ices-tools-dev/SEAwise
+      target: _blank
+    - icon: linkedin
+      text: SEAwise LinkedIn
+      href: https://www.linkedin.com/company/seawiseproject/
+      target: _blank
+---
+
+### Introduction
+
+This tutorial falls under SEAwise’s work on modelling the impact of fisheries on benthic ecosystems under Work Package 4: Ecological effects of fisheries. 
+
+SEAwise largely built upon the assessment methodology from the ICES Working Group on Fisheries Benthic Impact and Trade-offs ([WGFBIT Github tutorial](https://github.com/ices-eg/FBIT/tree/master/TAF%20-%20ICES%20tutorial){target="_blank"}) and applied it to several regional seas ([Van Hoey et al. 2023](https://doi.org/10.11583/DTU.24049767.v1){target="_blank"}). SEAwise also connected these benthic impact risk assessments to (1) spatial modelling approaches to evaluate spatial management scenarios (see [Van Hoey et al. 2024](https://doi.org/10.11583/DTU.28078970.v1){target="_blank"}; Bastardie et al. [2023](https://doi.org/10.11583/DTU.24331198.v1){target="_blank"}, [2024](https://doi.org/10.11583/DTU.28079429.v1){target="_blank"}, [2025](https://doi.org/10.3389/fmars.2025.1629180){target="_blank"})
+and to (2) mixed fisheries models to evaluate effort-related management scenarios developed in a Management Strategy Evaluation framework ([Kempf et al. 2024](https://doi.org/10.11583/DTU.25152662.v1){target="_blank"}, [2025](https://doi.org/10.11583/DTU.28081649.v1){target="_blank"}, [Garcia et al. 2025](https://doi.org/10.11583/DTU.29108039.v2){target="_blank"})
+
+Three steps will showcase benthic impact risk assessments (WP4) using outputs from effort-related fisheries management scenarios of the mixed fisheries model *FLBEIA* in the North Sea.
+
+1.  Simulating **depletion scenarios** by matching métier resolutions of benthic impact assessments (Benthis-métiers) with fisheries métiers of mixed fisheries models (e.g. NS FBLEIA métiers).
+
+2.  Fast **RBS estimation** for many simulated scenarios using a vectorized methodology from the [terra](https://rspatial.github.io/terra/){target="_blank"} package.
+
+3.  Estimation of **MSFD indicators**, relevant for seafloor integrity and based on the relative surface area meeting arbitrary RBS-thresholds.

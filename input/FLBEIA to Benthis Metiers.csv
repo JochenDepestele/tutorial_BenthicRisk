@@ -1,0 +1,96 @@
+fleet;metier;country_name;Benthis ;Factor
+BE_Beam>=24;BT1.4;Belgium;TBB_DMF;1
+BE_Beam>=24;BT2.4;Belgium;TBB_DMF;1
+BE_Beam>=24;BT2.7D;Belgium;TBB_DMF;1
+BE_Beam<24;BT2.4;Belgium;TBB_DMF;1
+BE_Beam<24;BT2.7D;Belgium;TBB_DMF;1
+BE_Otter;TR1.4;Belgium;OT_DMF;0.92
+BE_Otter;TR1.4;Belgium;SSC_DMF;0.08
+BE_Otter;TR2.4;Belgium;OT_CRU;0.8
+BE_Otter;TR2.4;Belgium;SSC_DMF;0.2
+DK_<10towed;TR2.3AN;Denmark;OT_CRU;1
+DK_Otter>=24;TR1.3AN;Denmark;OT_DMF;1
+DK_Otter>=24;TR1.4;Denmark;OT_DMF;1
+DK_Otter>=24;TR2.3AN;Denmark;OT_CRU;1
+DK_Otter>=24;TR2.4;Denmark;OT_CRU;1
+DK_Otter<24;TR1.4;Denmark;OT_DMF;1
+DK_Otter<24;TR2.3AN;Denmark;OT_CRU;1
+DK_Otter<24;TR2.4;Denmark;OT_CRU;1
+DK_Seine;TR1.3AN;Denmark;SDN_DMF;0.66
+DK_Seine;TR1.3AN;Denmark;SSC_DMF;0.33
+DK_Seine;TR1.4;Denmark;SSC_DMF;1
+EN_<10;TR2.4;United Kingdom;OT_CRU;1
+EN_<10;TR2.7D;United Kingdom;OT_DMF;1
+EN_Beam;BT1.4;United Kingdom;TBB_DMF;1
+EN_Beam;BT2.4;United Kingdom;TBB_DMF;1
+EN_Beam;BT2.7D;United Kingdom;TBB_DMF;1
+EN_Otter>=40;TR1.4;United Kingdom;OT_DMF;1
+EN_Otter<24;TR1.4;United Kingdom;OT_DMF;1
+EN_Otter<24;TR1.7D;United Kingdom;OT_DMF;1
+EN_Otter<24;TR2.4;United Kingdom;OT_CRU;1
+EN_Otter<24;TR2.7D;United Kingdom;OT_DMF;1
+EN_Otter24-40;otter_oth.4;United Kingdom;SSC_DMF;0.8
+EN_Otter24-40;otter_oth.4;United Kingdom;SDN_DMF;0.2
+EN_Otter24-40;otter_oth.7D;United Kingdom;SSC_DMF;0.9
+EN_Otter24-40;otter_oth.7D;United Kingdom;SDN_DMF;0.1
+EN_Otter24-40;TR1.4;United Kingdom;OT_DMF;1
+FR_<10;TR2.7D;France;OT_DMF;1
+FR_Beam;BT2.7D;France;TBB_DMF;1
+FR_OTH;TR2.7D;France;SSC_DMF;1
+FR_Otter>=40;TR1.4;France;OT_DMF;1
+FR_Otter>=40;TR1.6A;France;OT_DMF;1
+FR_Otter10-40;TR1.6A;France;OT_DMF;1
+FR_Otter10-40;TR1.7D;France;OT_DMF;1
+FR_Otter10-40;TR2.4;France;OT_DMF;0.5
+FR_Otter10-40;TR2.4;France;SDN_DMF;0.5
+FR_Otter10-40;TR2.7D;France;OT_DMF;0.87
+FR_Otter10-40;TR2.7D;France;SDN_DMF;0.13
+GE_Beam>=24;BT2.4;Germany;TBB_DMF;1
+GE_Beam<24;BT2.4;Germany;TBB_DMF;1
+GE_Otter>=40;OTH;Germany;OT_DMF;1
+GE_Otter<24;OTH;Germany;OT_DMF;1
+GE_Otter<24;TR2.4;Germany;OT_CRU;1
+GE_Otter24-40;OTH;Germany;OT_DMF;1
+GE_Otter24-40;TR1.4;Germany;OT_DMF;0.79
+GE_Otter24-40;TR1.4;Germany;SSC_DMF;0.21
+GE_Otter24-40;TR2.4;Germany;OT_CRU;0.82
+GE_Otter24-40;TR2.4;Germany;SSC_DMF;0.18
+NL_Beam>=40;BT1.3AN;Netherlands;TBB_DMF;1
+NL_Beam>=40;BT1.4;Netherlands;TBB_DMF;1
+NL_Beam>=40;BT2.4;Netherlands;TBB_DMF;1
+NL_Beam<24;BT1.3AN;Netherlands;TBB_DMF;1
+NL_Beam<24;BT1.4;Netherlands;TBB_DMF;1
+NL_Beam<24;BT2.4;Netherlands;TBB_DMF;1
+NL_Beam24-40;BT1.3AN;Netherlands;TBB_DMF;1
+NL_Beam24-40;BT1.4;Netherlands;TBB_DMF;1
+NL_Beam24-40;BT2.4;Netherlands;TBB_DMF;1
+NL_Otter;OTH;Netherlands;OT_DMF;0.6
+NL_Otter;OTH;Netherlands;SSC_DMF;0.4
+NL_Otter;TR1.4;Netherlands;OT_DMF;0.75
+NL_Otter;TR1.4;Netherlands;SSC_DMF;0.25
+NL_Otter;TR2.4;Netherlands;OT_CRU;0.58
+NL_Otter;TR2.4;Netherlands;SSC_DMF;0.42
+NL_Otter;TR2.7D;Netherlands;SSC_DMF;1
+NO_DSeine24-40;OTH;Norway;SSC_DMF;1
+NO_DSeine24-40;TR1.4;Norway;SSC_DMF;1
+NO_Otter>=40;TR1.4;Norway;OT_DMF;1
+NO_Otter24-40;TR1.4;Norway;OT_DMF;1
+SC_Beam;BT2.6A;United Kingdom;TBB_DMF;1
+SC_Beam;OTH;United Kingdom;TBB_DMF;1
+SC_Otter>=24;TR1.4;United Kingdom;OT_DMF;0.85
+SC_Otter>=24;TR1.4;United Kingdom;SSC_DMF;0.15
+SC_Otter>=24;TR1.6A;United Kingdom;OT_DMF;0.98
+SC_Otter>=24;TR1.6A;United Kingdom;SSC_DMF;0.02
+SC_Otter>=24;TR2.7D;United Kingdom;OT_DMF;0.21
+SC_Otter>=24;TR2.7D;United Kingdom;SSC_DMF;0.79
+SC_Otter<10;OTH;United Kingdom;OT_DMF;1
+SC_Otter<10;TR2.4;United Kingdom;OT_CRU;1
+SC_Otter<10;TR2.6A;United Kingdom;OT_CRU;1
+SC_Otter<24;TR1.4;United Kingdom;OT_DMF;0.97
+SC_Otter<24;TR1.4;United Kingdom;SSC_DMF;0.03
+SC_Otter<24;TR1.6A;United Kingdom;OT_DMF;1
+SC_Otter<24;TR2.4;United Kingdom;OT_CRU;1
+SC_Otter<24;TR2.6A;United Kingdom;OT_CRU;1
+SW_Otter;TR1.4;Sweden;OT_DMF;1
+SW_Otter;TR2.3AN;Sweden;OT_CRU;1
+SW_Otter;TR2_grid.3AN;Sweden;OT_CRU;1
