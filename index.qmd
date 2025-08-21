@@ -17,6 +17,7 @@
 title: "Risk assessments of fishing impacts on benthic state"
 subtitle: "Tutorial for the assessment of Relative Benthis State (RBS) using métier-specific effort changes from simulated fisheries management scenarios of the SEAwise North Sea case study"
 image: SeaWiseFinal-01.png
+sidebar: false
 about: # https://quarto.org/docs/websites/website-about.html
   template: trestles # Template based on https://github.com/EmilHvitfeldt/website-template
   links:
@@ -39,8 +40,8 @@ and to (2) mixed fisheries models to evaluate effort-related management scenario
 
 Three steps will showcase benthic impact risk assessments (WP4) using outputs from effort-related fisheries management scenarios of the mixed fisheries model *FLBEIA* in the North Sea.
 
-1.  Simulating **depletion scenarios** by matching métier resolutions of benthic impact assessments (Benthis-métiers) with fisheries métiers of mixed fisheries models (e.g. NS FBLEIA métiers).
+1.  Simulating [**depletion scenarios**](1_depletion_scenarios.qmd) by matching métier resolutions of benthic impact assessments (Benthis-métiers) with fisheries métiers of mixed fisheries models (e.g. NS FBLEIA métiers).
 
-2.  Fast **RBS estimation** for many simulated scenarios using a vectorized methodology from the [terra](https://rspatial.github.io/terra/){target="_blank"} package.
+2.  Fast [**RBS estimation**](2_RBS_estimation.qmd) for many simulated scenarios using a vectorized methodology from the [terra](https://rspatial.github.io/terra/){target="_blank"} package.
 
-3.  Estimation of **MSFD indicators**, relevant for seafloor integrity and based on the relative surface area meeting arbitrary RBS-thresholds.
+3.  [**MSFD assessment**](3_MSFD_indicators.qmd) of seafloor integrity.

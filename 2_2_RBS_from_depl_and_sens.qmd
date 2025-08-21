@@ -49,7 +49,7 @@ names(K_r) <- paste0("K_longcl",longevity)
 
 RBS is estimated for each individual grid cell by combining the recovery rates and carrycing capacity of each longevity class with the total depletion caused by the simulated scenarios. Raster algebra allows to estimate the reduction in biomass of each individual longevity class by reducing its carrying capacity with the ratio of depletion over recovery rates of that specific longevity class: $$
 \text{B} = K (1 - \frac{d \cdot \text{SAR}}{r})
-$$ The total biomass after depletion is estimated by grid cell for each of the simulated scenarios by summing the biomass of individual longevity classes, and restraining RBS values between zero and one. The final spatraster `rbs_r` has multiple layers with RBS values for each of the [simulated (mixed fisheries) scenarios](1_depletion_scenarios.qmd).
+$$ The total biomass after depletion is estimated by grid cell for each of the simulated scenarios by summing the biomass of individual longevity classes, and restraining RBS values between zero and one. The final spatraster `rbs_r` has multiple layers with RBS values for each of the simulated (mixed fisheries) scenarios (see[ 1.2 Depletion of mixed fisheries scenarios](1_2_Depletion_of_mixed_fisheries_scenarios.qmd)).
 
 ```{r RBS calculation, echo=T, eval=F}
 ## Selection depletion scenarios ----
@@ -87,5 +87,5 @@ panel(c(rbs_r,
 dev.off()
 
 ```
- 
-![RBS of two scenarios and their difference](./output/RBS_sel_scen.png){width="100%"}
+
+![RBS of two mixed fisheries scenarios and their difference](./output/RBS_sel_scen.png){width="100%"}

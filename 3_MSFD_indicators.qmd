@@ -1,5 +1,5 @@
 ---
-title: "3. MSFD indicators"
+title: "3. MSFD assessment (D6C5)"
 execute: 
   warning: false
   message: false
@@ -8,9 +8,9 @@ editor: visual
 
 Seafloor integrity is one of the 11 Descriptors in European environmental legislation to protect the marine ecosystem and biodiversity, i.e. Descriptor 6 in the Marine Strategy Framework Directive ([MSFD 2008/56/EC](http://data.europa.eu/eli/dir/2008/56/oj){target="_blank"}). This tutorial follows the rationale of the MSFD implementation for setting thresholds, which is defined under the fifth criterion stipulating adverse effects on habitats (D6C5). Two thresholds determine Good Environmental Status: one for habitat extent and one habitat quality.
 
-1. The maximum proportion of a benthic broad habitat type in an assessment area that can be adversely affected is **25 % of its natural (habitat) extent** (≤ 25 %) (see the Commission Notice on the threshold values [C/2024/2078](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:C_202402078){target="_blank"}). Broad habitat types (BHT) were defined by the EUSeaMap 2023 ([Vasquez et al. 2023](https://doi.org/10.13155/97116){target="_blank"}), while the areal proportions were estimated using grid cell resolution of 0.05 degrees. The proportion of its natural extent are shown for the Greater North Sea as a whole, but can also be estimated by jurisdiction, e.g. UK, EU and Norwegian waters or by national waters defined by the Exclusive Economic Zones (EEZ).
+1.  The maximum proportion of a benthic broad habitat type in an assessment area that can be adversely affected is **25 % of its natural (habitat) extent** (≤ 25 %) (see the Commission Notice on the threshold values [C/2024/2078](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:C_202402078){target="_blank"}). Broad habitat types (BHT) were defined by the EUSeaMap 2023 ([Vasquez et al. 2023](https://doi.org/10.13155/97116){target="_blank"}), while the areal proportions were estimated using grid cell resolution of 0.05 degrees. The proportion of its natural extent are shown for the Greater North Sea as a whole, but can also be estimated by jurisdiction, e.g. UK, EU and Norwegian waters or by national waters defined by the Exclusive Economic Zones (EEZ).
 
-2. The threshold for the habitat extent was agreed upon, but the D6 implementation has to this date (August 2025) not decided which thresholds and benthic indicators will be sued for assessment of **habitat quality**, i.e. what constitutes an adverse habitat impact. RBS classifies as one of the candidate indicators for its responsiveness to bottom trawling, but might have to be complemented with benthic (diversity) indicators to provide a more comprehensive understanding of seabed impacts ([Van Denderen et al. 2024](https://doi.org/10.1002/eap.3050){target="_blank"}). This tutorial is focused on RBS implementation and arbitrarily selected three threshold values (RBS = 0.75, 0.8 and 0.9) to assess which habitat types achieve this target. The 0.8 threshold was also used as cutoff in the ICES workshop [WKBENTH2](https://doi.org/10.17895/ices.pub.20731537.v1){target="_blank"} and [Pitcher et al. 2022](https://doi.org/10.1073/pnas.2109449119){target="_blank"}. All values are at the upper boundary of the ranges discussed in [Hiddink et al. 2023](https://doi.org/10.1093/icesjms/fsad035){target="_blank"}.
+2.  The threshold for the habitat extent was agreed upon, but the D6 implementation has to this date (August 2025) not decided which thresholds and benthic indicators will be sued for assessment of **habitat quality**, i.e. what constitutes an adverse habitat impact. RBS classifies as one of the candidate indicators for its responsiveness to bottom trawling, but might have to be complemented with benthic (diversity) indicators to provide a more comprehensive understanding of seabed impacts ([Van Denderen et al. 2024](https://doi.org/10.1002/eap.3050){target="_blank"}). This tutorial is focused on RBS implementation and arbitrarily selected three threshold values (RBS = 0.75, 0.8 and 0.9) to assess which habitat types achieve this target. The 0.8 threshold was also used as cutoff in the ICES workshop [WKBENTH2](https://doi.org/10.17895/ices.pub.20731537.v1){target="_blank"} and [Pitcher et al. 2022](https://doi.org/10.1073/pnas.2109449119){target="_blank"}. All values are at the upper boundary of the ranges discussed in [Hiddink et al. 2023](https://doi.org/10.1093/icesjms/fsad035){target="_blank"}.
 
 The code and figure below illustrate which BHT achieved the 75% habitat extent threshold at the scale of the Greater North Sea using three habitat quality thresholds (RBS=0.75, 0.8 or 0.9).
 
@@ -134,4 +134,4 @@ ggplot2::ggsave("./output/MSFDassess_sel_scen.png", unit="cm",width=30,height=15
 
 ```
 
-![MSFD assessment](./output/MSFDassess_sel_scen.png)
+![Benthic impact risk assessment of selected mixed fisheries scenarios](./output/MSFDassess_sel_scen.png)

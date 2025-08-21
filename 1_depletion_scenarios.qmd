@@ -8,8 +8,6 @@ execute:
 editor: visual
 ---
 
-# Depletion of fishing métiers
-
 Depletion is estimated from the times that a location is fished (fishing frequency) and the proportion of biota that are killed by a single pass of a mobile fishing gear (depletion rate *d*). Fishing frequency was estimated for mobile fishing gears only as the sum of area that is annually fished (or the swept area) divided by the surface area of the studied grid cell, defined as the Swept Area Ratio (*SAR*). Depletion should typically be estimated at high spatial resolution (here: 0.05° resolution), because mobile fisheries are spatially clustered ([Hiddink et al. 2017](https://doi.org/10.1073/pnas.1618858114){target="_blank"}, [Amoroso et al. 2018](https://doi.org/10.1073/pnas.1802379115){target="_blank"}). Depletion is estimated at métier level.
 
 Benthic impact risk assessments have categorized fishing métiers to discriminate for the width and penetration depth of the gears, such as the **Benthis-métiers** ([Eigaard et al. 2016](https://doi.org/10.1093/icesjms/fsv099){target="_blank"}, [Rijnsdorp et al. 2020](https://doi.org/10.1093/icesjms/fsaa050){target="_blank"}). Mixed fisheries models typically categorize fisheries using fleet and métiers, whereby fleets are based on country, broad gear groups and vessel length while **mixed fisheries métiers** are defined within fleets in terms of catchability of a commercial fish stock ([Garcia et al. 2017](https://doi.org/10.1016/j.softx.2017.06.001){target="_blank"}, [Kühn et al. 2023](https://doi.org/10.1111/fme.12629){target="_blank"}).

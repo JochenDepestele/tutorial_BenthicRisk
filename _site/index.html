@@ -87,28 +87,19 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">Risk assessments of fishing impacts on benthic state</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./1_depletion_scenarios.html"> 
-<span class="menu-text">1. Depletion scenarios</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./2_RBS_estimation.html"> 
-<span class="menu-text">2. RBS estimation</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./3_MSFD_indicators.html"> 
-<span class="menu-text">3. MSFD indicators</span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+        <div class="quarto-navbar-tools tools-end">
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label=""><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/JochenDepestele/tutorial_BenthicRisk">
+            source code
+            </a>
+          </li>
+      </ul>
+    </div>
 </div>
+          <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -148,9 +139,9 @@ ul.task-list li input[type="checkbox"] {
 <p>SEAwise largely built upon the assessment methodology from the ICES Working Group on Fisheries Benthic Impact and Trade-offs (<a href="https://github.com/ices-eg/FBIT/tree/master/TAF%20-%20ICES%20tutorial" target="_blank">WGFBIT Github tutorial</a>) and applied it to several regional seas (<a href="https://doi.org/10.11583/DTU.24049767.v1" target="_blank">Van Hoey et al.&nbsp;2023</a>). SEAwise also connected these benthic impact risk assessments to (1) spatial modelling approaches to evaluate spatial management scenarios (see <a href="https://doi.org/10.11583/DTU.28078970.v1" target="_blank">Van Hoey et al.&nbsp;2024</a>; Bastardie et al.&nbsp;<a href="https://doi.org/10.11583/DTU.24331198.v1" target="_blank">2023</a>, <a href="https://doi.org/10.11583/DTU.28079429.v1" target="_blank">2024</a>, <a href="https://doi.org/10.3389/fmars.2025.1629180" target="_blank">2025</a>) and to (2) mixed fisheries models to evaluate effort-related management scenarios developed in a Management Strategy Evaluation framework (<a href="https://doi.org/10.11583/DTU.25152662.v1" target="_blank">Kempf et al.&nbsp;2024</a>, <a href="https://doi.org/10.11583/DTU.28081649.v1" target="_blank">2025</a>, <a href="https://doi.org/10.11583/DTU.29108039.v2" target="_blank">Garcia et al.&nbsp;2025</a>)</p>
 <p>Three steps will showcase benthic impact risk assessments (WP4) using outputs from effort-related fisheries management scenarios of the mixed fisheries model <em>FLBEIA</em> in the North Sea.</p>
 <ol type="1">
-<li><p>Simulating <strong>depletion scenarios</strong> by matching métier resolutions of benthic impact assessments (Benthis-métiers) with fisheries métiers of mixed fisheries models (e.g.&nbsp;NS FBLEIA métiers).</p></li>
-<li><p>Fast <strong>RBS estimation</strong> for many simulated scenarios using a vectorized methodology from the <a href="https://rspatial.github.io/terra/" target="_blank">terra</a> package.</p></li>
-<li><p>Estimation of <strong>MSFD indicators</strong>, relevant for seafloor integrity and based on the relative surface area meeting arbitrary RBS-thresholds.</p></li>
+<li><p>Simulating <a href="./1_depletion_scenarios.html"><strong>depletion scenarios</strong></a> by matching métier resolutions of benthic impact assessments (Benthis-métiers) with fisheries métiers of mixed fisheries models (e.g.&nbsp;NS FBLEIA métiers).</p></li>
+<li><p>Fast <a href="./2_RBS_estimation.html"><strong>RBS estimation</strong></a> for many simulated scenarios using a vectorized methodology from the <a href="https://rspatial.github.io/terra/" target="_blank">terra</a> package.</p></li>
+<li><p><a href="./3_MSFD_indicators.html"><strong>MSFD assessment</strong></a> of seafloor integrity.</p></li>
 </ol>
 
 
@@ -575,14 +566,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>“Made with Quarto by Jochen Depestele (<a href="https://www.ilvo.vlaanderen.be" target="_blank">ILVO</a>)</p>
+<p>Made with Quarto by Jochen Depestele (<a href="https://www.ilvo.vlaanderen.be" target="_blank">ILVO</a>)</p>
 </div>   
     <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions"><ul><li><a href="https://github.com/JochenDepestele/tutorial_BenthicRisk/blob/master/./index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
 <p><img src="./SeaWiseFinal-01.png" class="light-content" alt="Posit" height="25"> Developed under <a href="https://seawiseproject.org" target="_blank">SEAwise</a></p>
 </div>
-    <div class="nav-footer-right">
-      &nbsp;
-    </div>
   </div>
 </footer>
 
