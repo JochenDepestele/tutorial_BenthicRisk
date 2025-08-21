@@ -54,3 +54,5 @@ format:
     code-fold: true
     code-copy: true
     code-link: true
+    grid:
+      sidebar-width: 400px

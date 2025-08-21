@@ -29,6 +29,9 @@ about: # https://quarto.org/docs/websites/website-about.html
       text: SEAwise LinkedIn
       href: https://www.linkedin.com/company/seawiseproject/
       target: _blank
+    # - icon: play
+    #   text: "Get Started"
+    #   href: 1_depletion_scenarios.qmd
 ---
 
 ### Introduction
@@ -45,3 +48,7 @@ Three steps will showcase benthic impact risk assessments (WP4) using outputs fr
 2.  Fast [**RBS estimation**](2_RBS_estimation.qmd) for many simulated scenarios using a vectorized methodology from the [terra](https://rspatial.github.io/terra/){target="_blank"} package.
 
 3.  [**MSFD assessment**](3_MSFD_indicators.qmd) of seafloor integrity.
+
+---
+
+[Get Started](1_depletion_scenarios.qmd){.btn .btn-primary}

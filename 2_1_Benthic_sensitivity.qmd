@@ -6,8 +6,6 @@ execute:
 editor: visual
 ---
 
-## Benthic sensitivity
-
 Benthic sensitivity was estimated as the intrinsic rate of biomass increase or recovery rate *r* of benthic community biomass, which was approximated by the longevity distribution, as long-lived taxa exhibit greater sensitivity to disturbance ([Hiddink et al. 2019](https://doi.org/10.1111/1365-2664.13278){target="_blank"}). Longevity was defined as the fuzzy-coded maximum lifespan of a taxa (e.g. [Bolam et al. 2014](https://doi.org/10.1016/j.seares.2013.05.003){target="_blank"}) and spatially mapped by predicting the untrawled state of benthic communities in sediments with slower-growing, larger-bodied and longer-lived macrobenthic biota following the methodology of [Rijnsdorp et al. 2018](https://doi.org/10.1002/eap.1731){target="_blank"}, which is described in detail in the [ICES-WGFBIT tutorial on Github](https://github.com/ices-eg/FBIT/tree/master/TAF%20-%20ICES%20tutorial){target="_blank"}), and applied in SEAwise to several regional seas ([Van Hoey et al. 2023](https://doi.org/10.11583/DTU.24049767.v1){target="_blank"}).
 
 ```{r Benthic sensitivity, echo=F}
