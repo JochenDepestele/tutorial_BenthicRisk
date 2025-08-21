@@ -29,17 +29,6 @@
     ]
   },
   {
-    "objectID": "2_1_Benthic_sensitivity.html#benthic-sensitivity",
-    "href": "2_1_Benthic_sensitivity.html#benthic-sensitivity",
-    "title": "2.1 Benthic sensitivity",
-    "section": "",
-    "text": "Benthic sensitivity was estimated as the intrinsic rate of biomass increase or recovery rate r of benthic community biomass, which was approximated by the longevity distribution, as long-lived taxa exhibit greater sensitivity to disturbance (Hiddink et al. 2019). Longevity was defined as the fuzzy-coded maximum lifespan of a taxa (e.g. Bolam et al. 2014) and spatially mapped by predicting the untrawled state of benthic communities in sediments with slower-growing, larger-bodied and longer-lived macrobenthic biota following the methodology of Rijnsdorp et al. 2018, which is described in detail in the ICES-WGFBIT tutorial on Github), and applied in SEAwise to several regional seas (Van Hoey et al. 2023).\n\n\n\nMedian longevity following Rijnsdorp et al. 2018. Recovery rate is the reciprocal of Longevity (r = 5.31/longevity , Hiddink et al. 2019)",
-    "crumbs": [
-      "2. RBS estimation",
-      "2.1 Benthic sensitivity"
-    ]
-  },
-  {
     "objectID": "1_2_Depletion_of_mixed_fisheries_scenarios.html",
     "href": "1_2_Depletion_of_mixed_fisheries_scenarios.html",
     "title": "1.2 Depletion of mixed fisheries scenarios",
