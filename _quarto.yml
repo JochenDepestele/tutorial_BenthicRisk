@@ -3,6 +3,8 @@ project:
 
 website:
   title: "Risk assessments of fishing impacts on benthic state"
+  site-url: 'https://jochendepestele.quarto.pub/assessment-of-benthic-impact-risk/' # https://tarleb.com/posts/quarto-sitemap/
+  site-path: '/'
   open-graph: true # https://quarto.org/docs/websites/website-tools.html#open-graph
   repo-url: https://github.com/JochenDepestele/tutorial_BenthicRisk/
   repo-actions: [source]
